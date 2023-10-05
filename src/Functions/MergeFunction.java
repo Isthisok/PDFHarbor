@@ -14,18 +14,12 @@ public class MergeFunction {
     /* -------------------------------------------------------------------------------------------------------------- */
     public static void mergePDF(String[] fileDirectories, String fileName) {
         String outputPath = PDFHarborFunctions.getSettingInfo("savePath") + "/" + fileName;
-        System.out.println(outputPath);
 
         int count = 1;
         while ((new File(outputPath)).isFile()){
-            System.out.println(count);
             outputPath = PDFHarborFunctions.getSettingInfo("savePath") + "/" + count + "-" + fileName;
-            System.out.println(outputPath);
             count++;
         }
-
-        System.out.println(count);
-        System.out.println(outputPath);
 
         try{
             PDFMergerUtility newPDF = new PDFMergerUtility();
