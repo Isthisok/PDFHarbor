@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Dependencies">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/Dependencies/json-20230618.jar!/" />
+      <root url="jar://$PROJECT_DIR$/Dependencies/pdfbox-3.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/Dependencies/pdfbox-io-3.0.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
