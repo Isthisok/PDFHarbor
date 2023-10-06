@@ -51,7 +51,6 @@ public class PDFHarborFunctions {
                 }
             }
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
             System.out.println("Method to handle FileNotFoundException in PDFHarborFunctions.getSavePath() not coded");
         }
         
@@ -65,10 +64,10 @@ public class PDFHarborFunctions {
      */
     public static void createPDFHarborDirectory() throws RuntimeException{
         File newFile = new File(PDFHarborFunctions.getSettingInfo("savePath"));
-        boolean success = newFile.mkdir();
+        boolean success = newFile.mkdirs();
 
         if (!success) {
-            throw new RuntimeException("Failed to create directory");
+            throw new RuntimeException("Method to handle failure to make file in PDFHarborFunctions.createPDFHarborDirectory() not coded");
         }
     }
 }
