@@ -1,6 +1,12 @@
 package Functions;
 
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.Scanner;
 
 public class PDFHarborFunctions {
@@ -37,7 +43,7 @@ public class PDFHarborFunctions {
     public static String getSettingInfo(String settingName){
         File systemSettingsFile = new File("src/SystemSettings.txt");
         String[] systemSettings = {};
-        String savePath = null;
+        String settingInfo = null;
 
         try {
             Scanner fileReader = new Scanner(systemSettingsFile);
@@ -46,28 +52,119 @@ public class PDFHarborFunctions {
             }
 
             for (String str: systemSettings){
-                if (str.length() > settingName.length() && str.startsWith(settingName)){
-                    savePath = str.substring(settingName.length() + 2);
+                if (str.length() > settingName.length() && str.startsWith(settingName + ": ")){
+                    settingInfo = str.substring(settingName.length() + 2);
                 }
             }
         } catch (FileNotFoundException e) {
             System.out.println("Method to handle FileNotFoundException in PDFHarborFunctions.getSavePath() not coded");
         }
         
-        return savePath;
+        return settingInfo;
+    }
+    /**
+     * This code snippet defines a static method named getOutputDirectory that returns a string. It checks if a certain
+     * setting called "savePath" is null. If it is null, it prints a default output directory and returns it. Otherwise,
+     * it retrieves the value of the "savePath" setting and returns it.
+     * <p></p>
+     * @return  the output directory path as a string
+     */
+    public static String getOutputDirectory(){
+        if (Objects.equals(getSettingInfo("savePath"), null)){
+            System.out.println((System.getProperty("user.home") + "/Documents/FlowHarbor/PDFHarbor"));
+            return (System.getProperty("user.home") + "/Documents/FlowHarbor/PDFHarbor");
+        }
+        else {
+            return getSettingInfo("savePath");
+        }
+
     }
     /**
      * This code snippet creates a new directory using the specified save path. If the directory creation is
-     * unsuccessful, it throws a runtime exception with an error message.
-     *<p></p>
-     * @throws RuntimeException   if the directory creation fails
      */
     public static void createPDFHarborDirectory() throws RuntimeException{
-        File newFile = new File(PDFHarborFunctions.getSettingInfo("savePath"));
-        boolean success = newFile.mkdirs();
+        File newFile = new File(getOutputDirectory());
+        System.out.println(getOutputDirectory());
+        boolean createDirectory = newFile.mkdirs();
+        System.out.println(createDirectory);
+    }
+    /**
+     * Modifies the system settings file with the given setting name and value.
+     *
+     * @param  settingName   the name of the setting to be modified
+     * @param  settingValue  the new value for the setting
+     */
+    public static void modifySettings(String settingName, String settingValue){
+        File systemSettingsFile = new File("src/SystemSettings.txt");
+        String[] systemSettings = {};
 
-        if (!success) {
-            throw new RuntimeException("Method to handle failure to make file in PDFHarborFunctions.createPDFHarborDirectory() not coded");
+        try {
+            Scanner fileReader = new Scanner(systemSettingsFile);
+
+            while (fileReader.hasNextLine()) {
+                systemSettings = appendToArray(systemSettings, fileReader.nextLine());
+            }
+
+            for (int x = 0; x < systemSettings.length; x++){
+                if (systemSettings[x].startsWith(settingName + ":")){
+                    systemSettings[x] = settingName + ":" + settingValue;
+                }
+            }
+
+            System.out.println(Arrays.toString(systemSettings));
+
+            if(systemSettingsFile.delete()){
+                systemSettingsFile.createNewFile();
+            } else {
+                System.out.println("Method to handle error in PDFHarborFunctions.modifySettings() not coded");
+            }
+
+            try (FileWriter fileWriter = new FileWriter(systemSettingsFile)){
+                for (String str: systemSettings){
+                    fileWriter.write(str + "\n");
+                }
+
+            } catch (Exception e){
+                System.out.println("Method to handle error in PDFHarborFunctions.modifySettings() not coded");
+            }
+
+        } catch (Exception e){
+            System.out.println("Method to handle error in PDFHarborFunctions.modifySettings() not coded");
         }
+    }
+
+    /**
+     * Sets the save path for files through the default file chooser program
+     */
+    public static void setSavePath(){
+        final JFileChooser newSavePath = new JFileChooser();
+        newSavePath.setDialogTitle("Directory To Save Files");
+        newSavePath.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+
+        int returnValue = newSavePath.showOpenDialog(null);
+
+        if (returnValue == JFileChooser.APPROVE_OPTION){
+            String selectedDirectory = newSavePath.getSelectedFile().getAbsolutePath();
+            modifySettings("savePath", selectedDirectory);
+        } else {
+            System.out.println("Method to handle error in PDFHarborFunctions.setSavePath() not coded");
+        }
+    }
+
+    /**
+     * Retrieves the file path of a selected PDF file.
+     *
+     * @return the absolute path of the selected PDF file
+     */
+    public static String getFilePath(){
+        final JFileChooser newFilePath = new JFileChooser();
+        newFilePath.setDialogTitle("Select PDF File");
+        newFilePath.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("PDF Files", "pdf");
+        newFilePath.setFileFilter(filter);
+
+        newFilePath.showOpenDialog(null);
+
+        return newFilePath.getSelectedFile().getAbsolutePath();
     }
 }
